@@ -24,7 +24,7 @@ import static com.midtrans.sdkdemo.BuildConfig.CLIENT_KEY;
 public class MainActivity extends AppCompatActivity {
 
     private Button btnPayment, btnWithToken;
-    private EditText edtSnapToken;
+    private EditText edtSnapToken, edtClientKey;
     private MidtransSDK midtransSDK;
 
 
@@ -33,9 +33,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bindView();
-        initializeMidtransUiKitSdk();
-        midtransSDK = MidtransSDK.getInstance();
-
 
         btnPayment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
                 payTransaction();
             }
         });
-
         btnWithToken.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,12 +52,12 @@ public class MainActivity extends AppCompatActivity {
         btnPayment = findViewById(R.id.btn_snapAuto);
         btnWithToken = findViewById(R.id.btn_withToken);
         edtSnapToken = findViewById(R.id.edt_snap_token);
+        edtClientKey = findViewById(R.id.edt_clientKey);
     }
 
-    private void initializeMidtransUiKitSdk() {
-
+    private void initializeMidtransUiKitSdk(String clientKey) {
         SdkUIFlowBuilder.init()
-                .setClientKey(CLIENT_KEY) // client_key is mandatory
+                .setClientKey(clientKey) // client_key is mandatory
                 .setContext(this) // context is mandatory
                 .setMerchantBaseUrl(BASE_URL) //set merchant url (required)
                 .enableLog(true) // enable sdk log (optional)
@@ -72,8 +68,9 @@ public class MainActivity extends AppCompatActivity {
     /*
      * Show snap with detail request from mobile SDK. The mobile SDK will request the snap token with detail to merchant backend
      */
-
     private void payTransaction() {
+        initializeMidtransUiKitSdk(CLIENT_KEY);
+        midtransSDK = MidtransSDK.getInstance();
 
         UIKitCustomSetting setting = new UIKitCustomSetting();
         setting.setSkipCustomerDetailsPages(true);
@@ -97,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
         If you want show Snap with only snap token
      */
     private void payWithToken() {
+        initializeMidtransUiKitSdk(edtClientKey.getText().toString());
+        midtransSDK = MidtransSDK.getInstance();
 
         UIKitCustomSetting setting = new UIKitCustomSetting();
         setting.setSkipCustomerDetailsPages(true);
