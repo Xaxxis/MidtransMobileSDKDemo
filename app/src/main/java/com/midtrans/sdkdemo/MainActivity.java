@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -46,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
                 payWithToken();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        edtSnapToken.setText("");
     }
 
     private void bindView() {
