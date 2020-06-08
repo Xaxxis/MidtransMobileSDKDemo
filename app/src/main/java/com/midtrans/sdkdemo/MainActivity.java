@@ -8,13 +8,16 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.midtrans.sdk.corekit.callback.TransactionFinishedCallback;
 import com.midtrans.sdk.corekit.core.MidtransSDK;
 import com.midtrans.sdk.corekit.core.TransactionRequest;
 import com.midtrans.sdk.corekit.core.UIKitCustomSetting;
 import com.midtrans.sdk.corekit.core.themes.CustomColorTheme;
 import com.midtrans.sdk.corekit.models.snap.Authentication;
 import com.midtrans.sdk.corekit.models.snap.CreditCard;
+import com.midtrans.sdk.corekit.models.snap.TransactionResult;
 import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
 
 import java.util.UUID;
@@ -72,6 +75,32 @@ public class MainActivity extends AppCompatActivity {
                 .buildSDK();
     }
 
+    public void onFinishedTransaction(TransactionResult result) {
+        if (result.getResponse() != null) {
+            switch (result.getStatus()) {
+                case TransactionResult.STATUS_SUCCESS:
+                    Toast.makeText(this, "Transaction Finished. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
+                    break;
+                case TransactionResult.STATUS_PENDING:
+                    Toast.makeText(this, "Transaction Pending. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
+                    break;
+                case TransactionResult.STATUS_FAILED:
+                    Toast.makeText(this, "Transaction Failed. ID: " + result.getResponse().getTransactionId() + ". Message: " + result.getResponse().getStatusMessage(), Toast.LENGTH_LONG).show();
+                    break;
+            }
+            result.getResponse().getValidationMessages();
+        } else if (result.isTransactionCanceled()) {
+            //TODO: Cancel TRX to your backend
+            Toast.makeText(this, "Transaction Canceled", Toast.LENGTH_LONG).show();
+        } else {
+            if (result.getStatus().equalsIgnoreCase(TransactionResult.STATUS_INVALID)) {
+                Toast.makeText(this, "Transaction Invalid", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Transaction Finished with failure.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     /*
      * Show snap with detail request from mobile SDK. The mobile SDK will request the snap token with detail to merchant backend
      */
@@ -82,6 +111,12 @@ public class MainActivity extends AppCompatActivity {
         UIKitCustomSetting setting = new UIKitCustomSetting();
         setting.setSkipCustomerDetailsPages(true);
         midtransSDK.setUIKitCustomSetting(setting);
+        midtransSDK.setTransactionFinishedCallback(new TransactionFinishedCallback() {
+            @Override
+            public void onTransactionFinished(TransactionResult transactionResult) {
+                onFinishedTransaction(transactionResult);
+            }
+        });
 
         CreditCard creditCard = new CreditCard();
         creditCard.setAuthentication(Authentication.AUTH_3DS);
@@ -107,6 +142,12 @@ public class MainActivity extends AppCompatActivity {
         UIKitCustomSetting setting = new UIKitCustomSetting();
         setting.setSkipCustomerDetailsPages(true);
         midtransSDK.setUIKitCustomSetting(setting);
+        midtransSDK.setTransactionFinishedCallback(new TransactionFinishedCallback() {
+            @Override
+            public void onTransactionFinished(TransactionResult transactionResult) {
+                onFinishedTransaction(transactionResult);
+            }
+        });
 
         // New object CC for set transaction is 3DS
         CreditCard creditCard = new CreditCard();
