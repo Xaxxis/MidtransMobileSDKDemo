@@ -26,6 +26,7 @@ import com.midtrans.sdk.corekit.models.snap.CreditCard;
 import com.midtrans.sdk.corekit.models.snap.TransactionResult;
 import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -33,9 +34,6 @@ import static com.midtrans.sdkdemo.BuildConfig.BASE_URL;
 import static com.midtrans.sdkdemo.BuildConfig.CLIENT_KEY;
 
 public class MainActivity extends AppCompatActivity {
-
-    static final String KEY_VALUE = "myKey";
-
 
     private Button btnPayment, btnWithToken, btnViewSp;
     private EditText edtSnapToken, edtClientKey;
@@ -169,8 +167,9 @@ public class MainActivity extends AppCompatActivity {
         creditCard.setAuthentication(Authentication.AUTH_3DS);
 
 
-        final UUID idRand = UUID.randomUUID();
-        TransactionRequest transactionRequest = new TransactionRequest(idRand.toString(), 202020);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String orderId = "MidSampleSDK-"+timestamp.getTime();
+        TransactionRequest transactionRequest = new TransactionRequest(orderId, 202020);
         transactionRequest.setCreditCard(creditCard);
 
         midtransSDK.setTransactionRequest(transactionRequest);
