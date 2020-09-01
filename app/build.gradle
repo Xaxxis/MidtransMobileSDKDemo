@@ -24,7 +24,7 @@ android {
             dimension "midtrans"
             applicationId "com.midtrans.sdkdemo"
             resValue "string", "app_name", "Midtrans Demo Dev"
-            buildConfigField "String", "BASE_URL", "\"https://midtrans-java.herokuapp.com/\""
+            buildConfigField "String", "BASE_URL", "\"http://midtrans-java.herokuapp.com/\""
             buildConfigField "String", "CLIENT_KEY", "\"SB-Mid-client-nKsqvar5cn60u2Lv\""
         }
     }
@@ -36,7 +36,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     // For using the Midtrans Sandbox
-    implementation 'com.midtrans:uikit:1.23.1-SANDBOX'
+    implementation 'com.midtrans:uikit:1.24.0-SANDBOX'
     implementation 'com.google.android.material:material:1.1.0'
 
     testImplementation 'junit:junit:4.12'
