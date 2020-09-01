@@ -13,16 +13,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.midtrans.sdk.corekit.callback.CardTokenCallback;
+import com.midtrans.sdk.corekit.callback.TransactionCallback;
 import com.midtrans.sdk.corekit.callback.TransactionFinishedCallback;
 import com.midtrans.sdk.corekit.core.LocalDataHandler;
 import com.midtrans.sdk.corekit.core.MidtransSDK;
+import com.midtrans.sdk.corekit.core.PaymentMethod;
 import com.midtrans.sdk.corekit.core.TransactionRequest;
 import com.midtrans.sdk.corekit.core.UIKitCustomSetting;
 import com.midtrans.sdk.corekit.core.themes.CustomColorTheme;
+import com.midtrans.sdk.corekit.models.CardTokenRequest;
+import com.midtrans.sdk.corekit.models.TokenDetailsResponse;
+import com.midtrans.sdk.corekit.models.TransactionResponse;
 import com.midtrans.sdk.corekit.models.UserAddress;
 import com.midtrans.sdk.corekit.models.UserDetail;
 import com.midtrans.sdk.corekit.models.snap.Authentication;
 import com.midtrans.sdk.corekit.models.snap.CreditCard;
+import com.midtrans.sdk.corekit.models.snap.CreditCardPaymentModel;
+import com.midtrans.sdk.corekit.models.snap.Gopay;
 import com.midtrans.sdk.corekit.models.snap.TransactionResult;
 import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
 
@@ -51,28 +59,28 @@ public class MainActivity extends AppCompatActivity {
         btnPayment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                payTransaction();
-            }
-        });
-        btnWithToken.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 payWithToken();
             }
         });
-        btnViewSp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startCustomFinishPage();
-            }
-        });
+//        btnWithToken.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                payWithToken();
+//            }
+//        });
+//        btnViewSp.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startCustomFinishPage();
+//            }
+//        });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        edtSnapToken.setText("");
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        edtSnapToken.setText("");
+//    }
 
     private void startCustomFinishPage() {
         Intent intent = new Intent(this, CustomFinishPageActivity.class);
@@ -81,10 +89,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void bindView() {
         btnPayment = findViewById(R.id.btn_snapAuto);
-        btnWithToken = findViewById(R.id.btn_withToken);
-        btnViewSp = findViewById(R.id.btn_toCustomFinishPage);
-        edtSnapToken = findViewById(R.id.edt_snap_token);
-        edtClientKey = findViewById(R.id.edt_clientKey);
+//        btnWithToken = findViewById(R.id.btn_withToken);
+//        btnViewSp = findViewById(R.id.btn_toCustomFinishPage);
+//        edtSnapToken = findViewById(R.id.edt_snap_token);
+//        edtClientKey = findViewById(R.id.edt_clientKey);
     }
 
     private void initializeMidtransUiKitSdk(String clientKey) {
@@ -93,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 .setContext(this) // context is mandatory
                 .setMerchantBaseUrl(BASE_URL) //set merchant url (required)
                 .enableLog(true) // enable sdk log (optional)
-                .setColorTheme(new CustomColorTheme("#FFE51255", "#B61548", "#FFE51255")) // set theme. it will replace theme on snap theme on MAP ( optional)
+                .setColorTheme(new CustomColorTheme("#2F80C2", "#07ADDC", "#88C7E8")) // set theme. it will replace theme on snap theme on MAP ( optional)
                 .buildSDK();
     }
 
@@ -101,7 +109,10 @@ public class MainActivity extends AppCompatActivity {
         if (result.getResponse() != null) {
             switch (result.getStatus()) {
                 case TransactionResult.STATUS_SUCCESS:
-                    Toast.makeText(this, "Transaction Finished. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Transaction Finished. ID: " + result.getResponse().getTransactionId() + result.getResponse().getMaskedCard() + result.getResponse().getBank(), Toast.LENGTH_LONG).show();
+                    System.out.println("TR MASK-CARD: "+result.getResponse().getMaskedCard());
+                    System.out.println("TR APPROVAL CODE: "+result.getResponse().getApprovalCode());
+                    System.out.println("TR BANK: "+result.getResponse().getBank());
                     break;
                 case TransactionResult.STATUS_PENDING:
                     Toast.makeText(this, "Transaction Pending. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
@@ -130,30 +141,32 @@ public class MainActivity extends AppCompatActivity {
         initializeMidtransUiKitSdk(CLIENT_KEY);
         midtransSDK = MidtransSDK.getInstance();
 
-        UserDetail userDetail = LocalDataHandler.readObject("user_details", UserDetail.class);
-        if (userDetail == null) {
-            userDetail = new UserDetail();
-            userDetail.setUserFullName("Zaki Ibrahim");
-            userDetail.setEmail("ibrahim@mailnesia.com");
-            userDetail.setPhoneNumber("08123456789");
-            // set user ID as identifier of saved card (can be anything as long as unique),
-            // randomly generated by SDK if not supplied
-            userDetail.setUserId("ibrahim-6789");
-
-            ArrayList<UserAddress> userAddresses = new ArrayList<>();
-            UserAddress userAddress = new UserAddress();
-            userAddress.setAddress("Jalan Iskandarsyah");
-            userAddress.setCity("Jakarta");
-            userAddress.setAddressType(com.midtrans.sdk.corekit.core.Constants.ADDRESS_TYPE_BOTH);
-            userAddress.setZipcode("12345");
-            userAddress.setCountry("IDN");
-            userAddresses.add(userAddress);
-            userDetail.setUserAddresses(userAddresses);
-            LocalDataHandler.saveObject("user_details", userDetail);
-        }
+//        UserDetail userDetail = LocalDataHandler.readObject("user_details", UserDetail.class);
+//        if (userDetail == null) {
+//            userDetail = new UserDetail();
+//            userDetail.setUserFullName("Zaki Ibrahim");
+//            userDetail.setEmail("ibrahim@mailnesia.com");
+//            userDetail.setPhoneNumber("08123456789");
+//            // set user ID as identifier of saved card (can be anything as long as unique),
+//            // randomly generated by SDK if not supplied
+//            userDetail.setUserId("ibrahim-6789");
+//
+//            ArrayList<UserAddress> userAddresses = new ArrayList<>();
+//            UserAddress userAddress = new UserAddress();
+//            userAddress.setAddress("Jalan Iskandarsyah");
+//            userAddress.setCity("Jakarta");
+//            userAddress.setAddressType(com.midtrans.sdk.corekit.core.Constants.ADDRESS_TYPE_BOTH);
+//            userAddress.setZipcode("12345");
+//            userAddress.setCountry("IDN");
+//            userAddresses.add(userAddress);
+//            userDetail.setUserAddresses(userAddresses);
+//            LocalDataHandler.saveObject("user_details", userDetail);
+//        }
 
         UIKitCustomSetting setting = new UIKitCustomSetting();
         setting.setSkipCustomerDetailsPages(true);
+        setting.setShowEmailInCcForm(true);
+        setting.setShowPaymentStatus(false);
         midtransSDK.setUIKitCustomSetting(setting);
 
         midtransSDK.setTransactionFinishedCallback(new TransactionFinishedCallback() {
@@ -165,12 +178,14 @@ public class MainActivity extends AppCompatActivity {
 
         CreditCard creditCard = new CreditCard();
         creditCard.setAuthentication(Authentication.AUTH_3DS);
+        creditCard.setSaveCard(true);
 
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String orderId = "MidSampleSDK-"+timestamp.getTime();
-        TransactionRequest transactionRequest = new TransactionRequest(orderId, 202020);
+        TransactionRequest transactionRequest = new TransactionRequest(orderId, 10000);
         transactionRequest.setCreditCard(creditCard);
+        transactionRequest.setGopay(new Gopay("demo://midtrans"));
 
         midtransSDK.setTransactionRequest(transactionRequest);
         midtransSDK.startPaymentUiFlow(this);
@@ -181,13 +196,14 @@ public class MainActivity extends AppCompatActivity {
         If you want show Snap with only snap token
      */
     private void payWithToken() {
-        initializeMidtransUiKitSdk(edtClientKey.getText().toString());
-        midtransSDK = MidtransSDK.getInstance();
+        initializeMidtransUiKitSdk("SB-Mid-client-nKsqvar5cn60u2Lv");
+       midtransSDK = MidtransSDK.getInstance();
 
-        UIKitCustomSetting setting = MidtransSDK.getInstance().getUIKitCustomSetting();
+        UIKitCustomSetting setting = new UIKitCustomSetting();
         setting.setSkipCustomerDetailsPages(true);
-        MidtransSDK.getInstance().setUIKitCustomSetting(setting);
-
+        setting.setShowEmailInCcForm(true);
+        setting.setShowPaymentStatus(false);
+        midtransSDK.setUIKitCustomSetting(setting);
         midtransSDK.setTransactionFinishedCallback(new TransactionFinishedCallback() {
             @Override
             public void onTransactionFinished(TransactionResult transactionResult) {
@@ -195,18 +211,64 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // New object CC for set transaction is 3DS
-        CreditCard creditCard = new CreditCard();
-        creditCard.setAuthentication(Authentication.AUTH_3DS);
-
-        final UUID idRand = UUID.randomUUID();
-        TransactionRequest transactionRequest = new TransactionRequest(idRand.toString(), 20202020);
-        transactionRequest.setCreditCard(creditCard);
-
-        Editable token = edtSnapToken.getText();
+//        // New object CC for set transaction is 3DS
+//        CreditCard creditCard = new CreditCard();
+//        creditCard.setAuthentication(Authentication.AUTH_3DS);
+//
+//        final UUID idRand = UUID.randomUUID();
+//        TransactionRequest transactionRequest = new TransactionRequest(idRand.toString(), 20202020);
+//        transactionRequest.setCreditCard(creditCard);
+//
+////        Editable token = edtSnapToken.getText();
+//        midtransSDK.setTransactionRequest(transactionRequest);
 
         // The snap token from your backend. You need get snap token request first from your backend before use this method.
-        midtransSDK.startPaymentUiFlow(this, token.toString());
+        midtransSDK.startPaymentUiFlow(this, "6a532a7e-621b-45b6-b5cb-8bdda510ce12");
+    }
+
+    private void payWithCoreKit() {
+
+//        CardTokenRequest cardTokenRequest = new CardTokenRequest("4105 0586 8948 1467", "123", "12", "22", CLIENT_KEY);
+//
+//        MidtransSDK.getInstance().getCardToken(cardTokenRequest, new CardTokenCallback() {
+//            @Override
+//            public void onSuccess(TokenDetailsResponse response) {
+//                // Card token will be used to charge the payment
+//                String cardToken = response.getTokenId();
+//                // Success action here
+//            }
+//
+//            @Override
+//            public void onFailure(TokenDetailsResponse response, String reason) {
+//                // Failure action here
+//            }
+//
+//            @Override
+//            public void onError(Throwable error) {
+//                // Error action here
+//            }
+//        });
+
+
+        CreditCardPaymentModel payment = new CreditCardPaymentModel("CARD_TOKEN", false);
+        MidtransSDK.getInstance().paymentUsingCard("CHECKOUT_TOKEN", payment, new TransactionCallback() {
+            @Override
+            public void onSuccess(TransactionResponse response) {
+                // Success Action here
+            }
+
+            @Override
+            public void onFailure(TransactionResponse response, String reason) {
+                // Failure Action here
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                // Error Action here
+            }
+        });
+
+
     }
 
 }
