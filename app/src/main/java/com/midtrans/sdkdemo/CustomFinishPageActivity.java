@@ -24,9 +24,11 @@ public class CustomFinishPageActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Uri data = intent.getData();
-        String result = data.getQueryParameter("result");
+//        String result = data.getQueryParameter("result");
+//
+//        tvValue.setText(result.toUpperCase());
 
-        tvValue.setText(result.toUpperCase());
+
 
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
