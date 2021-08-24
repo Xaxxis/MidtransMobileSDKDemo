@@ -18,16 +18,7 @@ android {
         }
     }
 
-    flavorDimensions "midtrans"
-    productFlavors {
-        development {
-            dimension "midtrans"
-            applicationId "com.midtrans.sdkdemo"
-            resValue "string", "app_name", "Midtrans Demo Dev"
-            buildConfigField "String", "BASE_URL", "\"https://midtrans-java.herokuapp.com/\""
-            buildConfigField "String", "CLIENT_KEY", "\"SB-Mid-client-nKsqvar5cn60u2Lv\""
-        }
-    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -39,7 +30,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     // For using the Midtrans Sandbox
-    implementation group: 'com.midtrans', name: 'uikit', version: '1.29.0-SANDBOX'
+    implementation group: 'com.midtrans', name: 'uikit', version: '1.29.2-SANDBOX'
     implementation 'com.google.android.material:material:1.4.0'
 
     testImplementation 'junit:junit:4.13.2'
